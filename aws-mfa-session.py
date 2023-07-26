@@ -7,11 +7,17 @@ import getpass
 MFA_ARN = os.getenv('MFA_ARN')
 AWS_PROFILE = os.getenv('AWS_PROFILE')
 
-# Prompt for the MFA token code
-token_code = getpass.getpass('Enter MFA code: ')
+# If the environment variables are not set, raise an error
+if not MFA_ARN or not AWS_PROFILE:
+    raise ValueError(
+        "MFA_ARN and AWS_PROFILE environment variables must be set")
 
 # Prompt for the profile name to store temporary credentials
-temp_profile = input('Enter the AWS profile name to store temporary credentials: ')
+temp_profile = input(
+    'Enter the AWS profile name to store temporary credentials: ')
+
+# Prompt for the MFA token code
+token_code = getpass.getpass('Enter MFA code: ')
 
 # Create a session with AWS
 session = boto3.Session(profile_name=AWS_PROFILE)
@@ -39,11 +45,13 @@ config.read(credentials_file)
 if not config.has_section(temp_profile):
     config.add_section(temp_profile)
 config.set(temp_profile, 'aws_access_key_id', credentials['AccessKeyId'])
-config.set(temp_profile, 'aws_secret_access_key', credentials['SecretAccessKey'])
+config.set(temp_profile, 'aws_secret_access_key',
+           credentials['SecretAccessKey'])
 config.set(temp_profile, 'aws_session_token', credentials['SessionToken'])
 
 # Write the updated credentials file
 with open(credentials_file, 'w') as f:
     config.write(f)
 
-print(f'Updated AWS credentials file with new session token for profile {temp_profile}.')
+print(
+    f'Updated AWS credentials file with new session token for profile {temp_profile}.')
