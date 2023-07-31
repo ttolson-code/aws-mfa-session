@@ -34,6 +34,8 @@ response = sts.get_session_token(
 # Get the credentials from the response
 credentials = response['Credentials']
 
+# print(credentials)
+
 # Get the path of the AWS credentials file
 credentials_file = os.path.expanduser('~/.aws/credentials')
 
@@ -48,6 +50,8 @@ config.set(temp_profile, 'aws_access_key_id', credentials['AccessKeyId'])
 config.set(temp_profile, 'aws_secret_access_key',
            credentials['SecretAccessKey'])
 config.set(temp_profile, 'aws_session_token', credentials['SessionToken'])
+config.set(temp_profile, 'aws_security_token', credentials['SessionToken'])
+config.set(temp_profile, 'expiration-date', str(credentials['Expiration']))
 
 # Write the updated credentials file
 with open(credentials_file, 'w') as f:
